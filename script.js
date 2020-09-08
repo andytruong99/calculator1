@@ -15,7 +15,7 @@ class Calculator{
 
     }
     appendNumber(number){
-        if(number === '.' && this.currentOperand.includes('.')) return
+        if(number === '.' && this.currentOperand.includes('.')) return  //if the user enters the period and it already has a period, then return.
         this.currentOperand = this.currentOperand.toString() + number.toString();
         
     }
