@@ -20,7 +20,7 @@ class Calculator{
         
     }
     chooseOperation(operation){
-        if(this.currentOperand === '') return  //avoids pressing operations before pressing a number.
+        if(this.currentOperand === '' || this.currentOperand === '.') return  //avoids pressing operations before pressing a number or decimal.
         if(this.previousOperand !== '') { //if you put 5 + 5 and then press divide. It will auto compute 5+5 and be waiting for the next number to divide from.
             this.compute();  
         }
@@ -47,6 +47,9 @@ class Calculator{
                 break;
             case '/':
                 computation = prev / current;
+                break;
+            case '%':
+                computation = prev % current;
                 break;
             default:
                 return
