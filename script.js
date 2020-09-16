@@ -2,14 +2,12 @@ class Calculator{
     constructor(previousOperandTextElement, currentOperandTextElement, thirdOperandTextElement){
         this.previousOperandTextElement = previousOperandTextElement;
         this.currentOperandTextElement = currentOperandTextElement;
-        this.thirdOperandTextElement = thirdOperandTextElement;
         this.clear();
     }
 
     clear(){
         this.currentOperand = ''
         this.previousOperand = ''
-        this.thirdOperand = ''
         this.operation = undefined
     }
     delete(){
@@ -82,11 +80,6 @@ class Calculator{
     updateDisplay(){
         this.currentOperandTextElement.innerText = this.getDisplayNumber(this.currentOperand)  //.innerText changes the value inside the html data-current-operand to whatever is inside the currentOperand. That is why it shows inside the display.
         //currentOperandTextElement = integerDisplay from getDisplayNumber
-
-        if(this.previousOperandTextElement.includes(document.innerText(['data-operation']))) { //if the previous operand has an operation in it
-            //then operation button will will be included in the current operand.
-            
-        } 
 
 
         if(this.operation != null){ //if operation does exist, then previousoperand will equal to previous operand and the operation it had.
