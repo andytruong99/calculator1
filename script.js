@@ -1,13 +1,11 @@
 class Calculator{
-    constructor(previousOperandTextElement, currentOperandTextElement, thirdOperandTextElement){
-        this.previousOperandTextElement = previousOperandTextElement;
+    constructor(currentOperandTextElement){
         this.currentOperandTextElement = currentOperandTextElement;
         this.clear();
     }
 
     clear(){
         this.currentOperand = ''
-        this.previousOperand = ''
         this.operation = undefined
     }
     delete(){
@@ -21,76 +19,80 @@ class Calculator{
     }
     chooseOperation(operation){
         if(this.currentOperand === '' || this.currentOperand === '.') return  //avoids pressing operations before pressing a number or decimal.
-        if(this.previousOperand !== '') { //if you put 5 + 5 and then press divide. It will auto compute 5+5 and be waiting for the next number to divide from.
-            this.compute();  
-        }
-        this.operation = operation //sets the operation from the listener to the calculator
-        this.previousOperand = this.currentOperand //since you have pressed the operation, the current operand needs to move above.
-        this.currentOperand = '' //empty the current operand so that you can put more numbers and operations in
+        //console.log('current operand ' + typeOf(this.currentOperand))
 
+        console.log('before if: ' + this.currentOperand.typeOf)
+        if(this.currentOperand.charAt(this.currentOperand.length-1) == '+' ||this.currentOperand.charAt(this.currentOperand.length-1) == '_'
+        ||this.currentOperand.charAt(this.currentOperand.length-1) == '*' ||this.currentOperand.charAt(this.currentOperand.length-1) == '/'
+        ||this.currentOperand.charAt(this.currentOperand.length-1) == '%') return  //avoids duplicate operations
+        console.log('after if: ' + this.currentOperand.typeOf)
+
+        this.operation = operation //sets the operation from the listener to the calculator
+        this.currentOperand = `${this.currentOperand}${this.operation}` //empty the current operand so that you can put more numbers and operations in
+        console.log('after if: ' + this.currentOperand.typeOf)
     }
     compute(){
-        let computation
-        const prev = parseFloat(this.previousOperand)
-        const current = parseFloat(this.currentOperand)
-        if(isNaN(prev) || isNaN(current)) return  //checks to see if there is a previousOperand and currentOperand to compute. returns undefined if I press = without any numbers.
+        console.log(this.currentOperand.length)
+        let numbersArray = [];
+        let operationsArray = [];
         
-        switch (this.operation){
-            case '+':
-                computation = prev + current;
-                break;
-            case '-':
-                computation = prev - current;
-                break;
-            case '*':
-                computation = prev * current;
-                break;
-            case '/':
-                computation = prev / current;
-                break;
-            case '%':
-                computation = prev % current;
-                break;
-            default:
-                return
+        
+        numbersArray = this.currentOperand.split(/[+,_,/,*,%]/).map(Number);  //changes string to number array.
+        console.log(numbersArray)
+
+        for(let i = 0; i<this.currentOperand.length;i++){
+            if(this.currentOperand[i] == '+'||this.currentOperand[i] == '_'
+            ||this.currentOperand[i] == '/'||this.currentOperand[i] == '*'
+            ||this.currentOperand[i] == '%'){
+                operationsArray.push(this.currentOperand[i]);
+            }
+
+            
         }
-        this.currentOperand = computation //changes currentOperand to equal the computation from above switch statement.
-        this.operation = undefined //resets the operation so it can accept another one.
-        this.previousOperand = '' //previousOperand is cleared out on the top.
+        console.log(operationsArray);
+
+        let computation = numbersArray[0]  //initial value is the first value of numbers.
+        let temp = 0;
+
+        for(let i = 1; i < numbersArray.length;i++){
+            switch(operationsArray[temp]){
+                case('+'):
+                    computation = computation + parseFloat(numbersArray[i]);
+                    temp++;
+                    break;
+                case('_'):
+                    computation = computation - parseFloat(numbersArray[i]);
+                    temp++
+                    break;
+                case('*'):
+                    computation = computation * parseFloat(numbersArray[i]);
+                    temp++
+                    break;
+                case('/'):
+                    computation = computation / parseFloat(numbersArray[i]);
+                    temp++
+                    break;
+                case('%'):
+                    computation = computation % parseFloat(numbersArray[i]);
+                    temp++
+                    break;
+            }
+
+        }
+        this.currentOperand = computation
+
+
 
     }
 
     getDisplayNumber(number) {  
-        const stringNumber = number.toString()
-        const integerDigits = parseFloat(stringNumber.split('.')[0])  //integer value of the decimal. 12.1-- integerDigits = 12
-        const decimalDigits = stringNumber.split('.')[1] // float value of the decimal. 12.1-- decimalDigits = 1
-        let integerDisplay
-        if (isNaN(integerDigits)) {  //if integerDigits is 'Not a Number'
-          integerDisplay = ''  //if 0th split of stringNumber is not a number then user pressed the decimal. this means that I can assume that there are no numbers before the decimal.
-        } else {
-          integerDisplay = integerDigits.toLocaleString('en', { maximumFractionDigits: 0 }) //so it looks like 1000 becomes 1,000 in the display.
-        }
-        if (decimalDigits != null) {  //if the decimal do exist from the [1] of the stringNumber split,
-          return `${integerDisplay}.${decimalDigits}` //then return the integerDisplay and the decimal digits present in stringNumber[1]
-        } else {
-          return integerDisplay //this says if there are no decimal digits, then it is an integer. We can just return whatever was inside the previous if else statement.
-        }
-      }
+
+    }
 
     updateDisplay(){
-        this.currentOperandTextElement.innerText = this.getDisplayNumber(this.currentOperand)  //.innerText changes the value inside the html data-current-operand to whatever is inside the currentOperand. That is why it shows inside the display.
-        //currentOperandTextElement = integerDisplay from getDisplayNumber
+        this.currentOperandTextElement.innerText = this.currentOperand
+        
 
-
-        if(this.operation != null){ //if operation does exist, then previousoperand will equal to previous operand and the operation it had.
-            this.previousOperandTextElement.innerText = `${this.previousOperand} ${this.operation}`
-        }else{//otherwise it stays empty.
-            this.previousOperandTextElement.innerText = ''
-        }
-
-        //this.previousOperandTextElement.innerText changed value inside the data-previous-operand to previousOperand + operation.
-
-        //updateDisplay is just changing the display text.. no calculations are actually being made in this method.
 
     }
 }
@@ -101,10 +103,9 @@ const operationButtons = document.querySelectorAll('[data-operation]')
 const equalsButton = document.querySelector('[data-equals]')
 const deleteButton = document.querySelector('[data-delete]')
 const allClearButton = document.querySelector('[data-all-clear]')
-const previousOperandTextElement = document.querySelector('[data-previous-operand]')
 const currentOperandTextElement = document.querySelector('[data-current-operand]')
 
-const calculator = new Calculator(previousOperandTextElement, currentOperandTextElement)
+const calculator = new Calculator(currentOperandTextElement)
 
 numberButtons.forEach(button => {
     button.addEventListener('click', () => {
